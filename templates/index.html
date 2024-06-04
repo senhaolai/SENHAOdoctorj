@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar Navigation</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        /* 中心的Logo样式 */
+        .logo {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0); /* 初始位置在屏幕中心，缩放为0 */
+            z-index: 1001;
+            width: 100%; 
+            max-width: 500px; 
+            opacity: 1;
+            transition: transform 0.5s ease, opacity 0.5s ease 3s; /* 动画持续时间0.5s，延迟3s后透明度变化 */
+        }
+
+        /* Header bar 中的Logo */
+        .header-logo {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-30%);
+            opacity: 0;
+            z-index: 1003; /* 确保 logo 在所有元素之上 */
+            transition: opacity 0.5s ease;
+            width: 40%; /* Logo的宽度为Header bar宽度的30% */
+            max-width: 150px; /* 最大宽度设置为150px */
+        }
+
+        /* 响应式样式 */
+        @media (min-width: 992px) {
+            .logo {
+                max-width: 100%; 
+                max-width: 500px;  /* 设置 logo 的最大宽度 */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                width: 100%;
+                max-width: 500px;  /* 设置 logo 的最大宽度 */
+            }
+        }
+
+        /* 自定义navbar-toggler-icon样式 */
+        .navbar-toggler-icon {
+            position: relative; 
+            display: inline-block;
+            width: 50px; 
+            height: 50px; 
+        }
+
+        .navbar-toggler-icon::before,
+        .navbar-toggler-icon::after,
+        .navbar-toggler-icon .line {
+            content: '';
+            background-color: rgb(245, 242, 242); /* 更改图标颜色 */
+            display: block;
+            height: 2px; /* 调整线条高度 */
+            width: 100%;
+            position: absolute;
+            left: 0;
+            transition: all 0.2s ease; /* 添加过渡效果 */
+        }
+
+        .navbar-toggler-icon::before {
+            top: 0; /* 调整位置以显示上条 */
+        }
+
+        .navbar-toggler-icon::after {
+            top: 100%; /* 调整位置以显示下条 */
+            transform: translateY(-100%);
+        }
+
+        .navbar-toggler-icon .line {
+            top: 50%; /* 调整位置以显示中间条 */
+            transform: translateY(-50%);
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -73px;
+            width: 73px;
+            height: 100%;
+            background: linear-gradient(to bottom,#38d9ee, #d15df5 );
+            padding-top: 60px;
+            transition: left 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar.active {
+            left: 0; /* 当active类被添加时，从左侧滑出 */
+        }
+
+        .sidebar-heading {
+            color: #ee1f1f;
+            padding: 10px 15px;
+            font-size: 1.2em;
+        }
+
+        .nav-link {
+            color: #ffffff;
+            padding: 10px 15px;
+        }
+
+        .nav-link:hover {
+            background-color: #495057;
+        }
+
+        .content {
+            margin-left: 100px; /* 修改为与侧边栏相同的宽度 */
+            padding: 20px;
+        }
+
+        .navbar-toggler {
+            z-index: 1001; /* 设置按钮的 z-index 以保证它在侧边栏之上 */
+        }
+
+        .header-bar {
+            position: relative;
+            height: 56px; 
+            opacity: 1;
+            background: linear-gradient(to right, #38d9ee, #d15df5); /* 添加渐变背景 */
+            transition: opacity 0.5s ease;
+            z-index: 1002; 
+        }
+    </style>
+</head>
+<body>
+    <img src="./images/logo_en.png" class="logo" id="centerLogo"> <!-- 中心的Logo -->
+    <img src="./images/logo_en.png" class="header-logo" id="headerLogo"> <!-- Header bar 中的 logo -->
+
+    <!-- 页面内容 -->
+    <div class="pos-f-t">
+        <!-- Header bar -->
+        <header class="header-bar navbar-dark bg-dark">
+            <button class="navbar-toggler" type="button" id="menu-toggle">
+                <span class="navbar-toggler-icon">
+                    <span class="line"></span>
+                </span>
+            </button>
+        </header>
+
+        <!-- 侧边栏 -->
+        <div class="bg-dark sidebar" id="sidebar">
+            <div class="sidebar-heading"></div>
+            <ul class="nav flex-column" id="menuItems">
+            </ul>
+        </div>
+        
+        <!-- 页面内容 -->
+        <div id="pageContent" class="content">
+            <div class="page-content"></div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // 定义一个包含分类和对应页面链接的 JSON 数组
+        const categories = [
+            { name: '介紹', url: './src/intro.html' },
+            { name: '洗烘', url: './src/laundry.html' },
+            { name: '通知', url: './src/notifications.html' },
+            { name: '點數', url: './src/points.html' },
+            { name: '購物', url: './src/shopping.html' },
+            { name: '加盟', url: './src/join.html' }
+        ];
+
+        // 在页面加载时动态生成侧边栏菜单
+        $(document).ready(function(){
+            const $menuItems = $('#menuItems');
+            
+            // 循环遍历 JSON 数组，为每个分类创建一个带图标的导航项
+            categories.forEach(function(category, index) {
+                $menuItems.append(`<li class="nav-item">
+                                        <a class="nav-link" href="${category.url}">
+                                            <img src="./images/a${index + 1}.png" style="width: 30px; height: 30px; margin-bottom: 5px; display: block;">
+                                            <span style="display: block;">${category.name}</span>
+                                        </a>
+                                    </li>`);
+            });
+
+            // 点击菜单按钮，切换侧边栏的显示状态
+            $('#menu-toggle').click(function() {
+                $('#sidebar').toggleClass('active');
+            });
+
+            // 延迟0.5秒后，显示Logo并执行飞入动画
+            setTimeout(() => {
+                $('#centerLogo').css('transform', 'translate(-50%, -50%) scale(1)');
+            }, 500); // 延迟0.5秒
+
+            // 3秒后，Logo消失，Header bar 显示
+            setTimeout(() => {
+                $('#centerLogo').remove(); // 从DOM中移除元素
+                $('.header-bar').css('opacity', 1);
+                $('#headerLogo').css('opacity', 1);
+            }, 3500);
+        });
+    </script>
+</body>
+</html>

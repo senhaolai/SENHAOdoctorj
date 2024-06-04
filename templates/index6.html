@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar Navigation</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        .logo {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0); /* 初始位置在屏幕中心，缩放为0 */
+            z-index: 1001;
+            width: 100%; 
+            max-width: 500px; 
+            opacity: 1;
+            transition: transform 0.5s ease, opacity 0.5s ease 3s; /* 动画持续时间0.5s，延迟3s后透明度变化 */
+        }
+
+        .header-logo-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .header-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            width: 30%; /* Logo的宽度为Header bar宽度的30% */
+            max-width: 150px; /* 最大宽度设置为150px */
+        }
+
+        @media (min-width: 992px) {
+            .logo {
+                max-width: 100%; 
+                max-width: 500px;  /* 设置 logo 的最大宽度 */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                width: 100%;
+                max-width: 500px;  /* 设置 logo 的最大宽度 */
+            }
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -73px;
+            width: 73px;
+            height: 100%;
+            background: linear-gradient(to bottom,#38d9ee, #d15df5 );
+            padding-top: 60px;
+            transition: left 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar.active {
+            left: 0; /* 当active类被添加时，从左侧滑出 */
+        }
+        .sidebar-heading {
+            color: #ffffff;
+            padding: 10px 15px;
+            font-size: 1.2em;
+        }
+        .nav-link {
+            color: #ffffff;
+            padding: 10px 15px;
+        }
+        .nav-link:hover {
+            background-color: #495057;
+        }
+        .content {
+            margin-left: 100px; /* 修改为与侧边栏相同的宽度 */
+            padding: 20px;
+        }
+        .navbar-toggler {
+            z-index: 1001; /* 设置按钮的 z-index 以保证它在侧边栏之上 */
+        }
+        .header-bar {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <img src="./images/logo_en.png" class="logo" id="centerLogo"> <!-- 图标在中间位置显示 -->
+
+    <!-- 页面内容 -->
+    <div class="pos-f-t">
+        <header class="header-bar navbar-dark bg-dark">
+            <div class="header-logo-container">
+                <img src="./images/logo_en.png" class="header-logo" id="headerLogo"> <!-- Header bar 中的 logo -->
+            </div>
+        </header> <!-- Header bar -->
+
+        <!-- 原始 Navbar 结构 -->
+        <nav class="navbar navbar-dark bg-dark">
+            <button class="navbar-toggler" type="button" id="menu-toggle">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </nav>
+
+        <!-- 侧边栏 -->
+        <div class="bg-dark sidebar" id="sidebar">
+            <div class="sidebar-heading"></div>
+            <ul class="nav flex-column" id="menuItems">
+            </ul>
+        </div>
+        
+        <!-- 页面内容 -->
+        <div id="pageContent" class="content">
+            <div class="page-content">Select a category to display content.</div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // 定义一个包含分类和对应值的 JSON 数组
+        const categories = [
+            { name: '介紹', value: 'Value 1Value 1Value 1Value 1Value 1Value 1' },
+            { name: '洗烘', value: 'ValuValue 1Value 1Value 1Value 1Value 1Value 1Value 1e 2' },
+            { name: '通知', value: 'ValuValue 1Value 1Value 1Value 1Value 1Value 1e 3' },
+            { name: '點數', value: 'ValValue 1Value 1Value 1Value 1Value 1ue 4' },
+            { name: '購物', value: 'ValValue 1Value 1Value 1Value 1Value 1ue 5' },
+            { name: '加盟', value: 'ValuValue 1Value 1Value 1Value 1Value 1Value 1e 6' }
+        ];
+
+        // 在页面加载时动态生成侧边栏菜单
+        $(document).ready(function(){
+            const $menuItems = $('#menuItems');
+            
+            // 循环遍历 JSON 数组，为每个分类创建一个带图标的导航项
+            categories.forEach(function(category, index) {
+                $menuItems.append(`<li class="nav-item">
+                                        <a class="nav-link" href="#" data-target="${category.value}">
+                                            <img src="./images/a${index + 1}.png" style="width: 30px; height: 30px; margin-bottom: 5px; display: block;">
+                                            <span style="display: block;">${category.name}</span>
+                                        </a>
+                                    </li>`);
+            });
+
+            // 点击菜单按钮，切换侧边栏的显示状态
+            $('#menu-toggle').click(function() {
+                $('#sidebar').toggleClass('active');
+            });
+
+            // 点击导航项，显示相应的页面内容
+            $('.nav-link').click(function(e){
+                e.preventDefault();
+                var target = $(this).data('target');
+                $('#pageContent').html(`<div class="page-content">${target}</div>`);
+            });
+
+            // 延迟0.5秒后，显示Logo并执行飞入动画
+            setTimeout(() => {
+                $('#centerLogo').css('transform', 'translate(-50%, -50%) scale(1)');
+            }, 500); // 延迟0.5秒
+        });
+
+        // 3秒后，Logo消失，Header bar 显示
+        setTimeout(() => {
+            $('#centerLogo').css('opacity', 0); // 透明度变为0，消失
+            $('.header-bar').css('opacity', 1); // Header bar 出现
+            $('#headerLogo').css('opacity', 1); // Header bar 中的 logo 透明度变为1
+        }, 3500); // 3秒后执行动画
+    </script>
+</body>
+</html>
